@@ -1,4 +1,5 @@
-function x_out = reach_analysis_lin_dis(timestep,A,B,dims,x0,input)
+function [x_out, R]= reach_analysis_lin_dis(timestep,A,B,dims,x0,input)
+    
     % Parameters --------------------------------------------------------------
     
     params.tFinal = timestep;
@@ -60,8 +61,8 @@ function x_out = reach_analysis_lin_dis(timestep,A,B,dims,x0,input)
         plot(simRes,projDims, 'DisplayName', 'Simulations');
         
         % label plot
-        xlim([0 1]);
-        ylim([0 100]);
+%         xlim([0 1]);
+%         ylim([0 100]);
         xlabel(['x_{',num2str(projDims(1)),'}']);
         ylabel(['x_{',num2str(projDims(2)),'}']);
         legend('Location', 'northwest')
@@ -74,5 +75,5 @@ function x_out = reach_analysis_lin_dis(timestep,A,B,dims,x0,input)
         x_out = 0 + simRes.x{i,1}(end,:);
     end
     x_out = x_out/25;  
-
+    assignin("base","R",R);
 end
