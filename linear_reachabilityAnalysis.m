@@ -1,7 +1,7 @@
 
 %------------- BEGIN CODE --------------
 
-clear all
+clear all;
 
 
 % System Dynamics ---------------------------------------------------------
@@ -15,7 +15,7 @@ Sys = linearSys('linearizedSys',A,B);
 
 % Parameters --------------------------------------------------------------
 
-params.tFinal = 0.3;
+params.tFinal = 5;
 
 %  0 < x1 < 2
 %  0 < x2 < 50
@@ -77,6 +77,7 @@ R_u1 = reach(Sys,fault1,options,safeSet);
 R_u2 = reach(Sys,fault2,options,safeSet);
 R_u3 = reach(Sys,fault3,options,safeSet);
 
+Rfault = [R_u1, R_u2, R_u3];
 
 % Redundancy Analysis------------------------------------------------------
 
@@ -96,14 +97,15 @@ R_u3 = reach(Sys,fault3,options,safeSet);
 
 % Simulation --------------------------------------------------------------
 
-simOpt.points = 50;
+simOpt.points = 10;
 simOpt.type = 'gaussian';
 
-% simRes = simulateRandom(Sys, params, simOpt);
-% simRes = simulateRandom(Sys, fault1, simOpt);
-% simRes = simulateRandom(Sys, fault2, simOpt);
-simRes = simulateRandom(Sys, fault3, simOpt);
+simRes = simulateRandom(Sys, params, simOpt);
+simResF1 = simulateRandom(Sys, fault1, simOpt);
+simResF2 = simulateRandom(Sys, fault2, simOpt);
+simResF3 = simulateRandom(Sys, fault3, simOpt);
 
+simResF = [simResF1, simResF2, simResF3];
 
 % Visualization -----------------------------------------------------------
 
@@ -120,25 +122,46 @@ for k = 1:length(dims)
     % plot reachable sets
     %plot(R,projDims, 'DisplayName', 'Reachable set');
     useCORAcolors("CORA:contDynamics", 3)
-     
+
     plot(Rout, projDims, 'DisplayName', sprintf("Reachable set over-approximation")); 
     %plot(Rin, projDims, 'DisplayName', sprintf("Reachable set inner-approximation")); 
     %plot(safeSet,projDims,'DisplayName', sprintf('Safe Set'));
 
     % plot(R_u1, projDims, 'DisplayName', sprintf("u1 = 0"));
     % plot(R_u2, projDims, 'DisplayName', sprintf("u2 = 0")); 
-    plot(R_u3, projDims, 'DisplayName', sprintf("u3 = 0")); 
+    % plot(R_u3, projDims, 'DisplayName', sprintf("u3 = 0")); 
 
     % plot initial set
     % plot(R.R0,projDims,'DisplayName','Initial set');
 
     % plot simulation results
-    plot(simRes,projDims, 'DisplayName', 'Simulations');
+    % plot(simRes,projDims, 'DisplayName', 'Simulations');
+    % plot(simResF,projDims, 'DisplayName', 'Simulations with fault');
 
     % label plot
     xlabel(['x_{',num2str(projDims(1)),'}']);
     ylabel(['x_{',num2str(projDims(2)),'}']);
+
     legend('Location', 'northwest')
+end
+
+for l = 1:3
+
+    figure; hold on; box on
+    useCORAcolors("CORA:contDynamics", 2)
+
+    plotOverTime(Rout, l, 'DisplayName', sprintf("Reachable set"));
+
+    % plotOverTime(R_u1, l, 'DisplayName', sprintf("u1 = 0"));
+    % plotOverTime(R_u2, l, 'DisplayName', sprintf("u2 = 0"));
+    %plotOverTime(R_u3, l, 'DisplayName', sprintf("u3 = 0"));
+
+    % label plot
+    xlabel(['t']);
+    ylabel(['x_{',num2str(l),'}']);
+
+    legend('Location', 'northwest')
+
 end
 
 
