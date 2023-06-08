@@ -15,7 +15,7 @@ Sys = linearSys('linearizedSys',A,B);
 
 % Parameters --------------------------------------------------------------
 
-params.tFinal = 5;
+params.tFinal = 6;
 
 %  0 < x1 < 2
 %  0 < x2 < 50
@@ -33,21 +33,23 @@ params.U = zonotope([200-u_eq(1); 2-u_eq(2); 200-u_eq(3)],...
 
 % Reachability Settings ---------------------------------------------------
 
-options.timeStep = 0.01; 
+options.timeStep = 0.1; 
 options.taylorTerms = 4;
-options.zonotopeOrder = 175; 
-% options.linAlg = 'adaptive'; % use adaptive parameter tuning 
+options.zonotopeOrder = 25; 
+%options.linAlg = 'wrapping-free';
 % options.error = 0.1;
 
 
 % Reachability Analysis ---------------------------------------------------
 
-safeSet = specification(zonotope(interval([0-x_eq(1); 0-x_eq(2); 0-x_eq(3)],...
-                                          [2-x_eq(1); 50-x_eq(2); 100-x_eq(3)])),...
-                                          'safeSet');
+% safeSet = specification(zonotope(interval([0-x_eq(1); 0-x_eq(2); 0-x_eq(3)],...
+%                                           [2-x_eq(1); 50-x_eq(2); 100-x_eq(3)])),...
+%                                           'safeSet');
+safeSet = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)],...
+                    [1 0 0 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10; 25 2 0 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10; 0 0 50 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10]);
 tic;
-%Rin = reachInner(Sys,params,options);
-Rout = reach(Sys,params,options,safeSet);
+Rin = reachInnerConstrained(Sys,params,options,safeSet);
+%Rout = reach(Sys,params,options,safeSet);
 tComp = toc;
 %stepssS = length(R.timeInterval.set);
 disp(['computation time of reachable set: ',num2str(tComp)]);
@@ -55,29 +57,29 @@ disp(['computation time of reachable set: ',num2str(tComp)]);
 % Fault model -------------------------------------------------------------
 
 u1 = 0;
-fault1.tFinal = Rout.timePoint.time{length(Rout.timePoint.time)};
+fault1.tFinal = Rin.timePoint.time{length(Rin.timePoint.time)};
 fault1.R0 = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)], zeros(3));
 fault1.U = zonotope([u1-u_eq(1); 2-u_eq(2); 200-u_eq(3)],...
                     [0.0001 0 0; 0 2 0; 0 0 200]);
  
 u2 = 0;
-fault2.tFinal = Rout.timePoint.time{length(Rout.timePoint.time)};
+fault2.tFinal = Rin.timePoint.time{length(Rin.timePoint.time)};
 fault2.R0 = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)], zeros(3));
 fault2.U = zonotope([200-u_eq(1); u2-u_eq(2); 200-u_eq(3)],...
                     [200 0 0; 0 0.0001 0; 0 0 200]);
 
 u3 = 0;
-fault3.tFinal = Rout.timePoint.time{length(Rout.timePoint.time)};
+fault3.tFinal = Rin.timePoint.time{length(Rin.timePoint.time)};
 fault3.R0 = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)], zeros(3));
 fault3.U = zonotope([200-u_eq(1); 2-u_eq(2); u3-u_eq(3)],...
                     [200 0 0; 0 2 0; 0 0 0.0001]);
 
+% 
+% R_u1 = reachInnerConstrained(Sys,fault1,options,safeSet);
+% R_u2 = reachInnerConstrained(Sys,fault2,options,safeSet);
+% R_u3 = reachInnerConstrained(Sys,fault3,options,safeSet);
 
-R_u1 = reach(Sys,fault1,options,safeSet);
-R_u2 = reach(Sys,fault2,options,safeSet);
-R_u3 = reach(Sys,fault3,options,safeSet);
-
-Rfault = [R_u1, R_u2, R_u3];
+% Rfault = [R_u1, R_u2, R_u3];
 
 % Redundancy Analysis------------------------------------------------------
 
@@ -123,8 +125,8 @@ for k = 1:length(dims)
     %plot(R,projDims, 'DisplayName', 'Reachable set');
     useCORAcolors("CORA:contDynamics", 3)
 
-    plot(Rout, projDims, 'DisplayName', sprintf("Reachable set over-approximation")); 
-    %plot(Rin, projDims, 'DisplayName', sprintf("Reachable set inner-approximation")); 
+    % plot(Rout, projDims, 'DisplayName', sprintf("Reachable set over-approximation")); 
+    plot(Rin, projDims, 'DisplayName', sprintf("Reachable set inner-approximation")); 
     %plot(safeSet,projDims,'DisplayName', sprintf('Safe Set'));
 
     % plot(R_u1, projDims, 'DisplayName', sprintf("u1 = 0"));
@@ -135,7 +137,7 @@ for k = 1:length(dims)
     % plot(R.R0,projDims,'DisplayName','Initial set');
 
     % plot simulation results
-    % plot(simRes,projDims, 'DisplayName', 'Simulations');
+     plot(simRes,projDims, 'DisplayName', 'Simulations');
     % plot(simResF,projDims, 'DisplayName', 'Simulations with fault');
 
     % label plot
@@ -150,7 +152,7 @@ for l = 1:3
     figure; hold on; box on
     useCORAcolors("CORA:contDynamics", 2)
 
-    plotOverTime(Rout, l, 'DisplayName', sprintf("Reachable set"));
+    plotOverTime(Rin, l, 'DisplayName', sprintf("Reachable set"));
 
     % plotOverTime(R_u1, l, 'DisplayName', sprintf("u1 = 0"));
     % plotOverTime(R_u2, l, 'DisplayName', sprintf("u2 = 0"));
