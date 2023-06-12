@@ -18,9 +18,8 @@ function Result = constant_redundancy_lin(sys)
     %% set inputs for constant redundancy
     analyinput = struct;
     analyinput.R0 = zonotope(x0, zeros(3));
-    analyinput.U_center = [200-u_eq(1); 2-u_eq(2); 200-u_eq(3)];
-    redundancystates = redundancy_init(sys);
-    analyinput.timestep = 3;
+    redundancystates = redundancy_init(sys,"linear");
+    analyinput.timestep = 2.5;
 
     %% Analyze
 
@@ -29,8 +28,10 @@ function Result = constant_redundancy_lin(sys)
     input_single = redundancystates.single;
     t_single = tic;
     parfor i = 1:num_single
-        U_generator = diag([input_single(i,1),input_single(i,2),input_single(i,3)])
-        [res_single{i}, R_single{i}] = reach_analysis_lin_dis(sys,analyinput,U_generator);
+        U_generator = diag([input_singl e(i,4),input_single(i,5),input_single(i,6)]);
+        U_center = [input_single(i,1),input_single(i,2),input_single(i,3)];
+        U = zonotope(U_center',U_generator);
+        [res_single{i}, R_single{i}] = reach_analysis_lin_dis(sys,analyinput,U);
     end
     toc(t_single);
     % with time = 3, 60 loops, total analysis time for single redundancy is 45.27

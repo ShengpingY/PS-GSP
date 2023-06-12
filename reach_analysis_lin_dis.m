@@ -4,7 +4,7 @@ function [simRes, R]= reach_analysis_lin_dis(sys,input,U)
     
     params.tFinal = input.timestep;
     params.R0 = input.R0;
-    params.U = zonotope(input.U_center,U);
+    params.U = U;
     x_eq = sys.x_eq;
     % Reachability Settings ---------------------------------------------------
     
