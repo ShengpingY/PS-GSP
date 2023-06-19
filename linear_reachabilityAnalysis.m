@@ -15,7 +15,7 @@ Sys = linearSys('linearizedSys',A,B);
 
 % Parameters --------------------------------------------------------------
 
-params.tFinal = 6;
+params.tFinal = 10;
 
 %  0 < x1 < 2
 %  0 < x2 < 50
@@ -153,10 +153,10 @@ for l = 1:3
     useCORAcolors("CORA:contDynamics", 2)
 
     plotOverTime(Rin, l, 'DisplayName', sprintf("Reachable set"));
-
+    plotOverTime(simRes,l, 'DisplayName', 'Simulations');
     % plotOverTime(R_u1, l, 'DisplayName', sprintf("u1 = 0"));
     % plotOverTime(R_u2, l, 'DisplayName', sprintf("u2 = 0"));
-    %plotOverTime(R_u3, l, 'DisplayName', sprintf("u3 = 0"));
+    % plotOverTime(R_u3, l, 'DisplayName', sprintf("u3 = 0"));
 
     % label plot
     xlabel(['t']);
