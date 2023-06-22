@@ -28,7 +28,7 @@ function Result = constant_redundancy_lin(sys)
     input_single = redundancystates.single;
     t_single = tic;
     parfor i = 1:num_single
-        U_generator = diag([input_singl e(i,4),input_single(i,5),input_single(i,6)]);
+        U_generator = diag([input_single(i,4),input_single(i,5),input_single(i,6)]);
         U_center = [input_single(i,1),input_single(i,2),input_single(i,3)];
         U = zonotope(U_center',U_generator);
         [res_single{i}, R_single{i}] = reach_analysis_lin_dis(sys,analyinput,U);
@@ -62,17 +62,28 @@ function Result = constant_redundancy_lin(sys)
 %     simres = [res_single res_double res_triple];
 %     R = [R_single R_double R_triple];
 
+    
     R = R_single;
-    n = max(size(R));
-    res_R = {};
-    for i = 1:n
-        res_R = [res_R R{i}.timeInterval.set];
+    timesteps = size(R{1}.timePoint.set,1);
+%     bundle ={};
+    for i = 1:timesteps
+        A = R{1}.timePoint.set(i);
+        B = R{2}.timePoint.set(i);
+        inter_set(i,1) = A{1,1} & B{1,1};
+%         bundle{1} = A{1,1};
+%         bundle{2} = B{1,1};
+%         res_R(i) = zonoBundle(bundle);
     end
+    set_limit_u1l = boundary_of_zonotope(R{1}.timePoint.set);
+    set_limit_u1r = boundary_of_zonotope(R{2}.timePoint.set);
+    set_limit_inter = boundary_of_zonotope(inter_set);
+    plot_interval_overtime(set_limit_inter.x1);
+    
 
-    timerange = size(res_R,1);
-    parfor i = 1:timerange
-        Result{1,i} = zonoBundle(res_R(i,:));
-    end
+%     timerange = size(res_R,1);
+%     parfor i = 1:timerange
+%         Result{1,i} = zonoBundle(res_R(i,:));
+%     end
 
 
 end
