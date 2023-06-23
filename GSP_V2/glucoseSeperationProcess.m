@@ -41,6 +41,11 @@ function dx = glucoseSeperationProcess(x,u)
     % differential equations
     dx(1,1) = a1*x(3)+a2*x(2)-b1*u(1)-b2*u(2)-k1; 
     dx(2,1) = -a3*x(2)*u(2)+k2;          
-    dx(3,1) = -a4*x(3)-a5*x(2)+b3*u(1)-((a6*x(3)+b4)/(b5*u(3)+k3))*u(3)+k4;         
+    dx(3,1) = -a4*x(3)-a5*x(2)+b3*u(1)-((a6*x(3)+b4)/(b5*u(3)+k3))*u(3)+k4;
+
+    % system borders
+    x(1) = max(min(x(1), 2), 0);
+    x(2) = max(min(x(2), 50), 0);
+    x(3) = max(min(x(3), 100), 0);
     
 %------------- END OF CODE --------------

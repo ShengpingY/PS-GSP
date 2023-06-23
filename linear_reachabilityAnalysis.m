@@ -15,7 +15,7 @@ Sys = linearSys('linearizedSys',A,B);
 
 % Parameters --------------------------------------------------------------
 
-params.tFinal = 10;
+params.tFinal = 300;
 
 %  0 < x1 < 2
 %  0 < x2 < 50
@@ -33,46 +33,43 @@ params.U = zonotope([200-u_eq(1); 2-u_eq(2); 200-u_eq(3)],...
 
 % Reachability Settings ---------------------------------------------------
 
-options.timeStep = 0.1; 
+options.timeStep = 1; 
 options.taylorTerms = 4;
-options.zonotopeOrder = 25; 
+options.zonotopeOrder = 50; 
 %options.linAlg = 'wrapping-free';
 % options.error = 0.1;
 
 
 % Reachability Analysis ---------------------------------------------------
 
-% safeSet = specification(zonotope(interval([0-x_eq(1); 0-x_eq(2); 0-x_eq(3)],...
-%                                           [2-x_eq(1); 50-x_eq(2); 100-x_eq(3)])),...
-%                                           'safeSet');
-safeSet = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)],...
-                    [1 0 0 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10; 25 2 0 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10; 0 0 50 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10 1e-10]);
-tic;
+safeSet = zonotope(interval([0-x_eq(1); 0-x_eq(2); 0-x_eq(3)],...
+                            [2-x_eq(1); 50-x_eq(2); 100-x_eq(3)]));
+tic
 Rin = reachInnerConstrained(Sys,params,options,safeSet);
-%Rout = reach(Sys,params,options,safeSet);
+%Rout = reach(Sys,params,options);
 tComp = toc;
 %stepssS = length(R.timeInterval.set);
 disp(['computation time of reachable set: ',num2str(tComp)]);
 
 % Fault model -------------------------------------------------------------
 
-u1 = 0;
-fault1.tFinal = Rin.timePoint.time{length(Rin.timePoint.time)};
-fault1.R0 = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)], zeros(3));
-fault1.U = zonotope([u1-u_eq(1); 2-u_eq(2); 200-u_eq(3)],...
-                    [0.0001 0 0; 0 2 0; 0 0 200]);
- 
-u2 = 0;
-fault2.tFinal = Rin.timePoint.time{length(Rin.timePoint.time)};
-fault2.R0 = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)], zeros(3));
-fault2.U = zonotope([200-u_eq(1); u2-u_eq(2); 200-u_eq(3)],...
-                    [200 0 0; 0 0.0001 0; 0 0 200]);
-
-u3 = 0;
-fault3.tFinal = Rin.timePoint.time{length(Rin.timePoint.time)};
-fault3.R0 = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)], zeros(3));
-fault3.U = zonotope([200-u_eq(1); 2-u_eq(2); u3-u_eq(3)],...
-                    [200 0 0; 0 2 0; 0 0 0.0001]);
+% u1 = 0;
+% fault1.tFinal = Rin.timePoint.time{length(Rin.timePoint.time)};
+% fault1.R0 = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)], zeros(3));
+% fault1.U = zonotope([u1-u_eq(1); 2-u_eq(2); 200-u_eq(3)],...
+%                     [0.0001 0 0; 0 2 0; 0 0 200]);
+% 
+% u2 = 0;
+% fault2.tFinal = Rin.timePoint.time{length(Rin.timePoint.time)};
+% fault2.R0 = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)], zeros(3));
+% fault2.U = zonotope([200-u_eq(1); u2-u_eq(2); 200-u_eq(3)],...
+%                     [200 0 0; 0 0.0001 0; 0 0 200]);
+% 
+% u3 = 0;
+% fault3.tFinal = Rin.timePoint.time{length(Rin.timePoint.time)};
+% fault3.R0 = zonotope([1-x_eq(1); 25-x_eq(2); 50-x_eq(3)], zeros(3));
+% fault3.U = zonotope([200-u_eq(1); 2-u_eq(2); u3-u_eq(3)],...
+%                     [200 0 0; 0 2 0; 0 0 0.0001]);
 
 % 
 % R_u1 = reachInnerConstrained(Sys,fault1,options,safeSet);
@@ -103,11 +100,11 @@ simOpt.points = 10;
 simOpt.type = 'gaussian';
 
 simRes = simulateRandom(Sys, params, simOpt);
-simResF1 = simulateRandom(Sys, fault1, simOpt);
-simResF2 = simulateRandom(Sys, fault2, simOpt);
-simResF3 = simulateRandom(Sys, fault3, simOpt);
+% simResF1 = simulateRandom(Sys, fault1, simOpt);
+% simResF2 = simulateRandom(Sys, fault2, simOpt);
+% simResF3 = simulateRandom(Sys, fault3, simOpt);
 
-simResF = [simResF1, simResF2, simResF3];
+% simResF = [simResF1, simResF2, simResF3];
 
 % Visualization -----------------------------------------------------------
 
@@ -123,21 +120,21 @@ for k = 1:length(dims)
 
     % plot reachable sets
     %plot(R,projDims, 'DisplayName', 'Reachable set');
-    useCORAcolors("CORA:contDynamics", 3)
+    useCORAcolors("CORA:contDynamics")
 
-    % plot(Rout, projDims, 'DisplayName', sprintf("Reachable set over-approximation")); 
+    %plot(Rout, projDims, 'DisplayName', sprintf("Reachable set over-approximation")); 
     plot(Rin, projDims, 'DisplayName', sprintf("Reachable set inner-approximation")); 
-    %plot(safeSet,projDims,'DisplayName', sprintf('Safe Set'));
+    plot(safeSet,projDims,'DisplayName', sprintf('Safe Set'));
 
     % plot(R_u1, projDims, 'DisplayName', sprintf("u1 = 0"));
     % plot(R_u2, projDims, 'DisplayName', sprintf("u2 = 0")); 
     % plot(R_u3, projDims, 'DisplayName', sprintf("u3 = 0")); 
 
     % plot initial set
-    % plot(R.R0,projDims,'DisplayName','Initial set');
+    plot(Rin.R0,projDims,'DisplayName','Initial set');
 
     % plot simulation results
-     plot(simRes,projDims, 'DisplayName', 'Simulations');
+    %plot(simRes,projDims, 'DisplayName', 'Simulations');
     % plot(simResF,projDims, 'DisplayName', 'Simulations with fault');
 
     % label plot
@@ -147,24 +144,24 @@ for k = 1:length(dims)
     legend('Location', 'northwest')
 end
 
-for l = 1:3
+% for l = 1:3
+% 
+%     figure; hold on; box on
+%     useCORAcolors("CORA:contDynamics")
+% 
+%     plotOverTime(Rout, l, 'DisplayName', sprintf("Reachable set"));
+%     plotOverTime(simRes,l, 'DisplayName', 'Simulations');
+%     % plotOverTime(R_u1, l, 'DisplayName', sprintf("u1 = 0"));
+%     % plotOverTime(R_u2, l, 'DisplayName', sprintf("u2 = 0"));
+%     % plotOverTime(R_u3, l, 'DisplayName', sprintf("u3 = 0"));
+% 
+%     % label plot
+%     xlabel(['t']);
+%     ylabel(['x_{',num2str(l),'}']);
+% 
+%     legend('Location', 'northwest')
 
-    figure; hold on; box on
-    useCORAcolors("CORA:contDynamics", 2)
-
-    plotOverTime(Rin, l, 'DisplayName', sprintf("Reachable set"));
-    plotOverTime(simRes,l, 'DisplayName', 'Simulations');
-    % plotOverTime(R_u1, l, 'DisplayName', sprintf("u1 = 0"));
-    % plotOverTime(R_u2, l, 'DisplayName', sprintf("u2 = 0"));
-    % plotOverTime(R_u3, l, 'DisplayName', sprintf("u3 = 0"));
-
-    % label plot
-    xlabel(['t']);
-    ylabel(['x_{',num2str(l),'}']);
-
-    legend('Location', 'northwest')
-
-end
+% end
 
 
 %------------- END OF CODE --------------
