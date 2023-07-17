@@ -19,7 +19,7 @@ function Result = constant_redundancy_lin(sys)
     analyinput = struct;
     analyinput.R0 = zonotope(x0, zeros(3));
     redundancystates = redundancy_init(sys,"linear");
-    analyinput.timestep = 2.5;
+    analyinput.timestep = 6;
 
     %% Analyze
 
@@ -27,7 +27,7 @@ function Result = constant_redundancy_lin(sys)
     num_single = size(redundancystates.single,1);
     input_single = redundancystates.single;
     t_single = tic;
-    parfor i = 1:num_single
+   for i = 1:num_single
         U_generator = diag([input_single(i,4),input_single(i,5),input_single(i,6)]);
         U_center = [input_single(i,1),input_single(i,2),input_single(i,3)];
         U = zonotope(U_center',U_generator);

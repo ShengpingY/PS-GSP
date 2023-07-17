@@ -1,0 +1,4 @@
+after trying to find outthe biggest ellipsoid in the polyhedron, 
+we got the matrix of ellipsoid B and d, but when trying to represent this ellipsoid with CORA package it's not 
+accurate, the ellipsoid with red dash line is the biggest enclosed in polyhedron, the blue one is obviously wrong
+and when trying to change ellipsoid into zonotope it's an overapproximation which is obviously what we want

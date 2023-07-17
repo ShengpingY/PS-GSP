@@ -8,7 +8,7 @@ function [simRes, R]= reach_analysis_lin_dis(sys,input,U)
     x_eq = sys.x_eq;
     % Reachability Settings ---------------------------------------------------
     
-    options.timeStep = 0.01; 
+    options.timeStep = 0.3; 
     options.taylorTerms = 4;
     options.zonotopeOrder = 20; 
     % System Dynamics ---------------------------------------------------------
@@ -18,8 +18,11 @@ function [simRes, R]= reach_analysis_lin_dis(sys,input,U)
 %     safeSet = specification(zonotope(interval([0-x_eq(1); 0-x_eq(2); 0-x_eq(3)],...
 %                                           [2-x_eq(1); 50-x_eq(2); 100-x_eq(3)])),...
 %                                           'safeSet');
+
+safeSet = zonotope(interval([0-x_eq(1); 0-x_eq(2); 0-x_eq(3)],...
+                                           [2-x_eq(1); 50-x_eq(2); 100-x_eq(3)]));
     tic
-    R = reach(Sys, params, options);
+    R = reachInnerConstrained(Sys, params,options,safeSet);
     tComp = toc;
     disp(['computation time of reachable set: ',num2str(tComp)]);
     
