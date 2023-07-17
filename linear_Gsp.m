@@ -1,4 +1,4 @@
-function [A,B,C,D] =linear_Gsp(f,h,x_eq)
+function [A,B,C,D,u_eq1] =linear_Gsp(f,h,x_eq)
 syms x1 x2 x3 u1 u2 u3
 x=[x1 x2 x3];
 u=[u1 u2 u3];
