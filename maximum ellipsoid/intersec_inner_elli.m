@@ -31,6 +31,7 @@ function ZE_new = intersec_inner_elli(ZE,Z1,Z2,varargin)
     EE = B * ZE; 
     new_g = EE.Z(:,2:end);
     ZE_new = zonotope(d,new_g);
+    
 
 %     % svd method
 %     [U,S,V] = svd(B);
