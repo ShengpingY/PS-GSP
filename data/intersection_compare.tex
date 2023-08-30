@@ -1,0 +1,66 @@
+% This file was created by matlab2tikz.
+%
+%The latest updates can be retrieved from
+%  http://www.mathworks.com/matlabcentral/fileexchange/22022-matlab2tikz-matlab2tikz
+%where you can also make suggestions and rate matlab2tikz.
+%
+\definecolor{mycolor1}{rgb}{0.92900,0.69400,0.12500}%
+\definecolor{mycolor2}{rgb}{0.00000,1.00000,1.00000}%
+%
+\begin{tikzpicture}
+
+\begin{axis}[%
+width=0.951\figurewidth,
+height=0.75\figurewidth,
+at={(0\figurewidth,0\figurewidth)},
+scale only axis,
+xmin=-1.6,
+xmax=3.7,
+ymin=-1,
+ymax=4.3,
+axis background/.style={fill=white},
+legend style={legend cell align=left, align=left, draw=white!15!black}
+]
+\addplot [color=mycolor1, line width=1.0pt]
+  table[row sep=crcr]{%
+1.2	-0.5\\
+3.2	1.5\\
+1.2	3.5\\
+-0.8	1.5\\
+1.2	-0.5\\
+};
+\addlegendentry{$\text{Z}_\text{k}$}
+
+\addplot [color=blue, line width=1.0pt]
+  table[row sep=crcr]{%
+0.5	-0.1\\
+2.5	1.9\\
+0.5	3.9\\
+-1.5	1.9\\
+0.5	-0.1\\
+};
+\addlegendentry{X}
+
+\addplot [color=red, line width=1.0pt]
+  table[row sep=crcr]{%
+0.418000000000001	-0.123999999999999\\
+2.722	1.604\\
+1.282	3.524\\
+-1.022	1.796\\
+0.418000000000001	-0.123999999999999\\
+};
+\addlegendentry{$\text{Z}_\text{3}$}
+
+
+\addplot[area legend, draw=black, fill=mycolor2]
+table[row sep=crcr] {%
+x	y\\
+-0.8	1.5\\
+1.05	3.35\\
+2.5	1.9\\
+0.65	0.05\\
+}--cycle;
+\addlegendentry{$\text{P}_{\text{k,true}}$}
+
+\end{axis}
+\end{tikzpicture}%
