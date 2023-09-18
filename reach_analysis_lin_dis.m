@@ -8,7 +8,7 @@ function [simRes, R]= reach_analysis_lin_dis(sys,input,U)
     x_eq = sys.x_eq;
     % Reachability Settings ---------------------------------------------------
     
-    options.timeStep = 0.3; 
+    options.timeStep = sys.timestep; 
     options.taylorTerms = 4;
     options.zonotopeOrder = 20; 
     % System Dynamics ---------------------------------------------------------
@@ -19,10 +19,16 @@ function [simRes, R]= reach_analysis_lin_dis(sys,input,U)
 %                                           [2-x_eq(1); 50-x_eq(2); 100-x_eq(3)])),...
 %                                           'safeSet');
 
-safeSet = zonotope(interval([0-x_eq(1); 0-x_eq(2); 0-x_eq(3)],...
+    safeSet = zonotope(interval([0-x_eq(1); 0-x_eq(2); 0-x_eq(3)],...
                                            [2-x_eq(1); 50-x_eq(2); 100-x_eq(3)]));
     tic
-    R = reachInnerConstrained(Sys, params,options,safeSet);
+    if sys.mode == "Ellipsoid_innerapproximation"
+        R = reachInnerConstrained(Sys, params,options,safeSet);
+    elseif sys.mode == "innerapproximation"
+        R = reachInner(Sys, params,options);
+    elseif sys.mode == "outerapproximation"
+        R = reach(Sys, params,options);
+    end
     tComp = toc;
     disp(['computation time of reachable set: ',num2str(tComp)]);
     
@@ -31,14 +37,5 @@ safeSet = zonotope(interval([0-x_eq(1); 0-x_eq(2); 0-x_eq(3)],...
     simOpt.points = 25;
     simOpt.type = 'gaussian';
     simRes = simulateRandom(Sys, params, simOpt);
-
-
-%     %Calculate final point
-%     i = 1;
-%     x_out = 0;
-%     for i = 1:25
-%         x_out = 0 + simRes.x{i,1}(end,:);
-%     end
-%     x_out = x_out/25;  
 
 end
